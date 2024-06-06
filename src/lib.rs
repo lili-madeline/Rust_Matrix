@@ -1,6 +1,6 @@
 use std::fmt;
-use std::fmt::Write;
 use std::fmt::Debug;
+use std::fmt::Write;
 use std::iter::Sum;
 use std::ops::{Add, Index, IndexMut, Mul, Sub};
 
@@ -36,6 +36,25 @@ where
             len: [ROW, COL],
             data: array,
         }
+    }
+
+    fn lu_decompose(&self) -> (Matrix<f64, ROW, COL>, Matrix<f64, ROW, COL>)
+    where
+        Matrix<T, ROW, COL>: Square,
+        f64: From<T>,
+    {
+        let out: Matrix<f64, ROW, COL> = Matrix::default();
+        let temp: Matrix<f64, ROW, COL> = Matrix::new(self.data.map(|x| x.map(|y| f64::from(y))));
+        todo!()
+    }
+
+    pub fn determinant(&self) -> f64
+    where
+        Matrix<T, ROW, COL>: Square,
+        f64: From<T>,
+    {
+        let (l, u) = self.lu_decompose();
+        todo!()
     }
 
     pub fn transpose(&self) -> Matrix<T, COL, ROW> {
@@ -77,17 +96,14 @@ where
             .max()
             .unwrap();
 
-        let s: String = self
-            .data
-            .iter()
-            .fold(String::new(),|mut out, row| {
-                let col = row.iter().fold(String::new(), |mut out, x| {
-                    let _ = write!(out, "{: ^1$?}\t", x, size);
-                    out
-                });
-                let _ = writeln!(out, "{col}");
+        let s: String = self.data.iter().fold(String::new(), |mut out, row| {
+            let col = row.iter().fold(String::new(), |mut out, x| {
+                let _ = write!(out, "{: ^1$?}\t", x, size);
                 out
             });
+            let _ = writeln!(out, "{col}");
+            out
+        });
         write!(f, "\n{}", s)
     }
 }
@@ -225,7 +241,10 @@ mod tests {
 
     #[test]
     fn transpose() {
-        assert_eq!(MATRIX_NON_SQUARE_2.transpose(), matrix![1.0 4.0; 2.0 5.0; 3.0 6.0]);
+        assert_eq!(
+            MATRIX_NON_SQUARE_2.transpose(),
+            matrix![1.0 4.0; 2.0 5.0; 3.0 6.0]
+        );
     }
 
     #[test]
