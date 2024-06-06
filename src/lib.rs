@@ -1,4 +1,5 @@
 use std::fmt;
+use std::fmt::Write;
 use std::fmt::Debug;
 use std::iter::Sum;
 use std::ops::{Add, Index, IndexMut, Mul, Sub};
@@ -79,15 +80,14 @@ where
         let s: String = self
             .data
             .iter()
-            .map(|y| {
-                format!(
-                    "{}\n",
-                    y.iter()
-                        .map(|x| format!("{: ^1$?}\t", x, size))
-                        .collect::<String>()
-                )
-            })
-            .collect::<String>();
+            .fold(String::new(),|mut out, row| {
+                let col = row.iter().fold(String::new(), |mut out, x| {
+                    let _ = write!(out, "{: ^1$?}\t", x, size);
+                    out
+                });
+                let _ = writeln!(out, "{col}");
+                out
+            });
         write!(f, "\n{}", s)
     }
 }
@@ -243,6 +243,7 @@ mod tests {
         assert_eq!(MATRIX_SQUARE - MATRIX_SQUARE, matrix![0.0 0.0; 0.0 0.0]);
     }
 
+    //noinspection RsTypeCheck
     #[test]
     fn mul() {
         assert_eq!(2.0 * MATRIX_SQUARE, matrix![2.0 4.0; 6.0 8.0]);
